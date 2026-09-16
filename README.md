@@ -53,29 +53,63 @@
 
      Milestone 3. -->
 
-**Chunk 1** — source: `` — produced by: ``
+**Chunk 1** — source: `` — produced by: chunker.py::fallback_split``
 
-```
-```
+```# Getting around the region with limited mobility
 
-**Chunk 2** — source: `` — produced by: ``
+An honest assessment rather than a promotional one. Some of these places are
+difficult and it is better to know in advance.
 
-```
-```
+## Straightforward
 
-**Chunk 3** — source: `` — produced by: ``
-
-```
-```
-
-**Chunk 4** — source: `` — produced by: ``
-
-```
+**Thornby Wells** is the easiest town in the region. It is flat, compact, and
+everything is within three minutes of everything else. Parking is free for two
+hours anywhere in town and the station is centr
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+**Chunk 2** — source: `` — produced by: chunker.py::fallback_split``
 
+```cheese and little else, and it closes at 4pm. Bring supplies; this is not a place with options.
+
+## What to see
+
+The valley itself is the attraction. The footpath network is dense and well marked, and a circuit taking in three of the four villages is about nine miles with 500 metres of ascent. The chapel in the second village is 12th century and always unlocked.
+
+## Where to stay
 ```
+
+**Chunk 3** — source: `` — produced by: chunker.py::fallback_split``
+
+```attached to the mill, open 10 to 4 daily except Tuesdays, which sells bread made from the flour ground twenty metres away and is the reason most people come. One pub, food served lunchtimes and Thursday to Saturday evenings.
+
+## What to see
+
+The mill runs tours on the hour from 11 to 3 and the machinery is operating during them, which is loud and much more impressive than a static exhibit. The chu
+```
+
+**Chunk 4** — source: `` — produced by: chunker.py::fallback_split``
+
+```# Marchwood
+
+Marchwood is the regional hub — 180,000 people, the junction everyone changes trains at, and a city most visitors pass through rather than stop in. That is a mistake, though an understandable one, since almost nothing of interest is near the station.
+
+## Getting there
+
+Every railway line in the region meets here, which is the city's defining feature. Trains to Brightwater run every 40
+```
+
+**Chunk 5** — source: `` — produced by: chunker.py::fallback_split``
+
+```lk up.
+
+## Walking and cycling
+
+The river path from Brightwater runs four miles upstream on a good surface. The
+old railway trackbed from Kestrelford runs six miles on an easy gradient and is
+the best walking in the region for the effort involved. The coastal path from
+Halden Bay is more serious — exposed, and closed in high wind.
+
+Cycling is pleasant on the river path and the trackbed, and unplea
 ```
 
 ## Sample Answer
