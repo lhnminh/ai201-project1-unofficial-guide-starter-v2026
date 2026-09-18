@@ -21,11 +21,7 @@
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+This is a retrieval-augmented Q&A system built on the `city_guides` corpus: fourteen long, sectioned travel guides covering nine fictional towns plus five cross-cutting guides (eating, walking, seasons, accessibility, and regional transport). It answers specific, factual questions about those towns — opening hours, the best time of year to visit, whether a place is walkable, where to eat on a given day — by embedding the question, retrieving the closest chunks from a Chroma vector index, and asking a language model to answer using only what was retrieved. A relevance gate checks the best retrieved distance before generating anything, so questions clearly outside the corpus (unrelated trivia, other domains entirely) get refused instead of answered with a guess.
 
 ## Chunking Strategy
 
@@ -117,11 +113,14 @@ Cycling is pleasant on the river path and the trackbed, and unplea
 <!-- One complete question and answer, pasted as text, with the source line
      visible. Milestone 4. -->
 
-**Question:**
+**Question:** Where to go eat at Elder Ness on Monday?
 
 **Answer:**
 
 ```
+Based on the provided documents, Elder Ness has one pub, but it is closed on Mondays, and there is no mention of anywhere else to eat there on that day (*guide_eating.md*).
+
+Sources retrieved: guide_accessibility.md, guide_eating.md, guide_elder_ness.md, guide_kestrelford.md
 ```
 
 **My relevance cutoff:**
@@ -150,9 +149,9 @@ Cycling is pleasant on the river path and the trackbed, and unplea
 
      Milestone 5. -->
 
-**1.**
+**1.** I asked Claude to run three of my five test questions through `app.py retrieve` and read the *full* chunk text (not just the truncated preview) to judge whether the top-5 results were genuinely on-topic or just sharing a few words with the question. For "What's the most accessible city in town?" it came back showing that only the #1 result (distance 0.412, naming Thornby Wells) actually answered the question — ranks 2–5 (distance 0.49–0.54) were near-identical "Practical notes" boilerplate about hospitals and mobile coverage that appears in every town's guide, pulled in by word overlap with "accessible" rather than actual topical relevance. That changed how I'm reading distance scores for Milestone 4: I stopped assuming the whole top-5 is relevant just because it passed the gate, and I'm now looking at the ~0.46–0.49 gap between "answers the question" and "shares vocabulary" as a candidate place for the cutoff, rather than trusting rank order alone.
 
-**2.**
+**2.** I asked Claude to run `app.py ask` on the same three questions to see the actual generated answers with sources. For "When is the best time to visit Halden Bay," I expected "June and September" (that's what I wrote in `questions.py`), but the model's answer only said "June," citing `guide_seasons.md`. That told me the September mention either isn't in the chunks that got retrieved for this phrasing, or it got separated from the June sentence by chunking — something I need to check directly in Milestone 3's diagnosis step rather than assume the retrieval is simply wrong.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
