@@ -178,17 +178,50 @@ Sources retrieved: guide_accessibility.md, guide_eating.md, guide_elder_ness.md,
 
      Milestone 1. -->
 
+> No `scorer.py` exists yet, so I judged every run myself by reading the
+> "Real output" sections of the three files below. Retrieval is deterministic
+> (same top-k sources and best distance on every run, every file), so
+> criterion 1 and criterion 3 don't actually vary between Run 1/2/3 — only
+> the generated wording does (criterion 2). Run 1 = `results/run_2026-09-23_1838.md`,
+> Run 2 = `results/run_2026-09-23_1906_before.md`, Run 3 = `results/run_2026-09-23_1908_before.md`
+> (three separate full executions of `run_eval.py`, each already averaging
+> 3 internal regenerations per question).
+
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 4/5 | 4/5 | 4/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
 | 4. | | | | | |
 | 5. | | | | | |
 
-<!-- Underneath, paste the REAL output for each criterion from one of your
-     runs — the actual text your system produced, not a description of it.
-     Name the file and function that produced it. -->
+**Criterion 1 evidence** — produced by `store.py::search` (sources/distance) and judged against `questions.py::QUESTIONS[*]["expects"]`. The one miss is the same question in all three files:
+
+> **When is the best time to visit Halden Bay** — expects `"June and September"`.
+> Retrieved sources every run: `guide_halden_bay.md, guide_regional_transport.md, guide_seasons.md, guide_walking.md` (best distance 0.2926).
+> Across all 9 generations (3 files × 3 runs), the answer mentions June (and often the July/August parking problem) but **never September** — e.g. from `run_2026-09-23_1908_before.md`, run 3:
+> ```
+> June is excellent everywhere. (Source: `guide_seasons.md`)
+> ```
+> `guide_halden_bay.md` itself has a `## When to go` section reading "June and September are the sweet spot," so the fact exists in the corpus — the chunk that got retrieved from that file evidently wasn't the one carrying that sentence.
+
+**Criterion 2 evidence** — every one of the 45 generated answers (5 questions × 3 runs × 3 files) names at least one source. Example from `run_2026-09-23_1838.md`, "Should I walk to Corry Vale" — run 2:
+
+> ```
+> The **Corry Vale circuit** provides a moderate walk that takes in three of the four villages, covering about nine miles with 500 metres of ascent (*guide_walking.md*).
+>
+> Additionally, the documents note that Corry Vale features footpaths rather than pavements, with villages located two to four miles apart, and lacks public transport (*guide_accessibility.md*).
+> ```
+
+**Criterion 3 evidence** — produced by `run_eval.py::check_out_of_scope`, cutoff 0.6. Identical in all three files:
+
+| Out-of-scope question | Best distance | Gate |
+|---|---|---|
+| What is the capital of Mongolia? | 0.799 | refused |
+| How do I change the oil in a diesel engine? | 0.892 | refused |
+| Who won the 1994 World Cup? | 0.811 | refused |
+| What is the recommended dosage of ibuprofen for a headache? | 0.839 | refused |
+| How do I write a for loop in Rust? | 0.839 | refused |
 
 ## Verdicts
 
@@ -203,11 +236,11 @@ Sources retrieved: guide_accessibility.md, guide_eating.md, guide_elder_ness.md,
 
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 1 | Retrieved chunk contains the answer (4 of 5) | MET | 4/5 held in all three separate runs (`run_2026-09-23_1838.md`, `1906_before.md`, `1908_before.md`). The one recurring miss is the same question every time — "When is the best time to visit Halden Bay" expects "June and September," but across all 9 generations (3 runs × 3 internal regenerations) the answer only ever surfaces June, never September, even though `guide_halden_bay.md`'s own `## When to go` section literally says "June and September are the sweet spot." That sentence's chunk evidently isn't among the ones retrieval hands back, so it missed consistently rather than occasionally — the other four questions held 3/3 every time. |
+| 2 | Every answer names a source (5 of 5) | MET | 5/5 in every one of the three runs — all 45 generated answers (5 questions × 3 regenerations × 3 runs) named at least one source file with no exceptions. Not close either way. |
+| 3 | Gate stops out-of-corpus questions (4 of 5) | MET | The gate refused 5 of 5 out-of-scope questions, identically in all three runs (this check is deterministic, not resampled). Best distances for the out-of-scope set (0.799–0.892) sit well clear of the 0.6 cutoff, so there's no borderline case pulling this down in a future run. |
+| 4 | At least 4 of 5 sample chunks read as a complete section | MISSED | Of the 5 sample chunks pasted above (from `chunker.py::fallback_split`), 2 start cleanly on a heading (Chunk 1, Chunk 4) but every single one — including those two — ends mid-word or mid-sentence: Chunk 1 cuts off at "...station is centr", Chunk 3 starts at "attached to the mill..." (already mid-sentence) and ends at "...The chu", Chunk 4 ends at "...run every 40". That's 0 of 5 chunks intact start-to-finish, well under the 4-of-5 target — not a close call. |
+| 5 | Every corpus source is retrieved by at least one test question | MISSED | Pooling the "Sources retrieved" lists across all 5 test questions (from any of the three run files, since retrieval is deterministic) gives 10 distinct files. The corpus has 14: `guide_brightwater.md`, `guide_givens_mill.md`, `guide_marchwood.md`, and `guide_thornby_wells.md` never appear for any of my five questions, so 4 of 14 sources are never exercised by this test set. |
 
 ## Diagnoses
 
